@@ -1,0 +1,4 @@
+[core]
+    remote = mylocalstorage
+['remote "mylocalstorage"']
+    url = C:\Users\91990\Downloads\DVC_Assignment4

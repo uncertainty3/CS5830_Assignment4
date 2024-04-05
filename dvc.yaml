@@ -1,0 +1,48 @@
+stages:
+  download:
+    cmd: python task1.py
+    deps:
+    - task1.py
+    params:
+    - download.base_url
+    - download.num_files_to_fetch
+    - global.Year
+    - global.download_dir
+    - global.filter_cols
+    outs:
+    - csv_files/
+  prepare:
+    cmd: python task2.py
+    deps:
+    - csv_files
+    - task2.py
+    params:
+    - global.Year
+    - global.download_dir
+    - global.filter_cols
+    - global.hourly_cols
+    - prepare.gt_dir
+    outs:
+    - data/gt
+  process:
+    cmd: python task3.py
+    deps:
+    - csv_files
+    - task3.py
+    params:
+    - global.download_dir
+    - global.hourly_cols
+    - prepare.gt_dir
+    - process.calc_dir
+    outs:
+    - data/calculated
+  evaluate:
+    cmd: python task4.py
+    deps:
+    - data
+    - task4.py
+    params:
+    - global.filter_cols
+    - prepare.gt_dir
+    outs:
+    - R2results.csv

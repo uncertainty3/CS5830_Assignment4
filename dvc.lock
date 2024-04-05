@@ -1,0 +1,125 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: python task1.py
+    deps:
+    - path: task1.py
+      hash: md5
+      md5: bf7e43520a4f5e452ba75d8c60dd8ed5
+      size: 2139
+    params:
+      params.yaml:
+        download.base_url: https://www.ncei.noaa.gov/data/local-climatological-data/access/2023/
+        download.num_files_to_fetch: 2
+        global.Year: 2023
+        global.download_dir: csv_files
+        global.filter_cols:
+        - MonthlyAverageRH
+        - MonthlyDewpointTemperature
+        - MonthlySeaLevelPressure
+        - MonthlyStationPressure
+        - MonthlyWetBulb
+    outs:
+    - path: csv_files/
+      hash: md5
+      md5: f20d458ab59eb4d08ffba89c410e5800.dir
+      size: 16851536
+      nfiles: 2
+  prepare:
+    cmd: python task2.py
+    deps:
+    - path: csv_files
+      hash: md5
+      md5: f20d458ab59eb4d08ffba89c410e5800.dir
+      size: 16851536
+      nfiles: 2
+    - path: task2.py
+      hash: md5
+      md5: 9ecdf267ae677e72be184901d3df7e3c
+      size: 1024
+    params:
+      params.yaml:
+        global.Year: 2023
+        global.download_dir: csv_files
+        global.filter_cols:
+        - MonthlyAverageRH
+        - MonthlyDewpointTemperature
+        - MonthlySeaLevelPressure
+        - MonthlyStationPressure
+        - MonthlyWetBulb
+        global.hourly_cols:
+        - HourlyRelativeHumidity
+        - HourlyDewPointTemperature
+        - HourlySeaLevelPressure
+        - HourlyStationPressure
+        - HourlyWetBulbTemperature
+        prepare.gt_dir:
+        - data
+        - gt
+    outs:
+    - path: data/gt
+      hash: md5
+      md5: 3f8db2e7ed776d54acffba7a4b24b10a.dir
+      size: 460
+      nfiles: 2
+  process:
+    cmd: python task3.py
+    deps:
+    - path: csv_files
+      hash: md5
+      md5: f20d458ab59eb4d08ffba89c410e5800.dir
+      size: 16851536
+      nfiles: 2
+    - path: task3.py
+      hash: md5
+      md5: c42a8562d53269c75441fdaf4b33423a
+      size: 1722
+    params:
+      params.yaml:
+        global.download_dir: csv_files
+        global.hourly_cols:
+        - HourlyRelativeHumidity
+        - HourlyDewPointTemperature
+        - HourlySeaLevelPressure
+        - HourlyStationPressure
+        - HourlyWetBulbTemperature
+        prepare.gt_dir:
+        - data
+        - gt
+        process.calc_dir:
+        - data
+        - calculated
+    outs:
+    - path: data/calculated
+      hash: md5
+      md5: a23aa69bdf9882ec5a327da965aa5331.dir
+      size: 1078
+      nfiles: 2
+  evaluate:
+    cmd: python task4.py
+    deps:
+    - path: data
+      hash: md5
+      md5: ef795ec2a21b699f648431c98e4eb326.dir
+      size: 1556
+      nfiles: 5
+    - path: task4.py
+      hash: md5
+      md5: 1663583e7b7123df4653a2514addb5b1
+      size: 1241
+    params:
+      params.yaml:
+        global.filter_cols:
+        - MonthlyAverageRH
+        - MonthlyDewpointTemperature
+        - MonthlySeaLevelPressure
+        - MonthlyStationPressure
+        - MonthlyWetBulb
+        prepare.gt_dir:
+        - data
+        - gt
+    outs:
+    - path: R2results.csv
+      hash: md5
+      md5: b2fa8f7af5440daf87c35353ec6f2267
+      size: 156
